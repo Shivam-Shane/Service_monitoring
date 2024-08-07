@@ -1,0 +1,28 @@
+"""
+URL configuration for gmail_monitoring project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/5.0/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+# monitor/urls.py
+from django.urls import path
+from views import index_view
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('', index_view, name='index_view'),
+    # path('start/', start_monitoring_view, name='start_monitoring'),
+    # path('stop/', stop_monitoring_view, name='stop_monitoring'),
+    path('admin/', admin.site.urls),
+]

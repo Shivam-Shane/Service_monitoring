@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail Monitoring</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="#home" onclick="showSection('home')">Home</a></li>
+            <li><a href="#configuration" onclick="showSection('configuration')">Configuration</a></li>
+            <li><a href="#settings" onclick="showSection('settings')">Settings</a></li>
+        </ul>
+    </nav>
+
+    <section id="home">
+        <h1>Welcome to Gmail Monitoring</h1>
+        <p>This is the home page content.</p>
+    </section>
+
+    <section id="configuration" style="display:none;">
+        <h1>Gmail Monitoring Configuration:</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {% for key, value in config.items %}
+                <label for="{{ key }}">{{ key }}:</label>
+                <input type="{% if 'SMTP_PASSWORD' in key %}password{% else %}text{% endif %}" 
+                   id="{{ key }}" 
+                   name="{{ key }}" 
+                   value="{{ value }}" 
+                   readonly>
+                <br>
+            {% endfor %}
+        </form>
+    </section>
+
+    <section id="settings" style="display:none;">
+        <h1>Settings</h1>
+        <p>This is the settings page content.</p>
+    </section>
+
+    <script src="{% static 'scripts.js' %}"></script>
+</body>
+</html>
