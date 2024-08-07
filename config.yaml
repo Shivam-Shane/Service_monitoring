@@ -1,0 +1,16 @@
+#--------------- Define your email, file, and settings details here
+# Set up the IMAP connection
+IMAP_SERVER : 'imap.gmail.com'
+IMAP_PORT : 993
+SMTP_SERVER : 'smtp.gmail.com'
+SMTP_PORT : 587
+# Set up your email credentials
+SMTP_USERNAME : 'shivam1@ivp.in'
+SMTP_PASSWORD : 'your_gmail_app_password'
+FROM_EMAIL : 'noreply via itsupport <itsupport@ivp.in>'
+CSV_FILE : 'emails.csv'
+KEYWORDS : ['critical', 'down']
+# Threshold for which the emails would be valid for checking
+TIME_THRESHOLD: 900
+REPLY_MESSAGE : "Hi Team, \n Please check the alerts below, "
+SENDER_NAME: "Shivam"
