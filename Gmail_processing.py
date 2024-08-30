@@ -41,8 +41,8 @@ class GmailProcess():
                 # Check if today's date is already in the 'Last Sent' column
                 last_sent_str = row['Last Sent'] if pd.notna(row.get('Last Sent', '')) else ''
                 last_sent_date = datetime.strptime(last_sent_str, '%Y-%m-%d %H:%M:%S') if last_sent_str else None
-                sent_for_critical = str(row.get('sent_for_critical', '')).strip().lower() == 'true'
-                sent_for_down = str(row.get('sent_for_down', '')).strip().lower() == 'true'
+                sent_for_critical = str(row.get('sent_for_critical', '')).strip().lower() == 'received'
+                sent_for_down = str(row.get('sent_for_down', '')).strip().lower() == 'received'
                 is_critical = 'critical' in subject.lower()
                 is_down = 'down' in subject.lower()
 
@@ -68,9 +68,9 @@ class GmailProcess():
 
                     # Update CSV to keep track of sent emails
                     if is_critical:
-                        data.at[index,'sent_for_critical'] = 'true'
+                        data.at[index,'sent_for_critical'] = 'received'
                     if is_down:
-                        data.at[index,'sent_for_down'] = 'true'
+                        data.at[index,'sent_for_down'] = 'received'
                     data.at[index, 'Last Sent'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     data.to_csv(self.config.CSV_FILE, index=False)
                     logging.info(f"Updated CSV with sent email for subject: {csv_subject}")
