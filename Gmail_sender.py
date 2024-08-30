@@ -13,7 +13,9 @@ class GmailClient():
 
     def send_email(self, to_emails, subject, body, original_email_str=None):
         msg = MIMEMultipart()
-        msg['From'] = f'{self.config.SENDER_NAME} <{self.config.SMTP_USERNAME}>'
+        SENDER_NAME_VALUE=self.config.get('SENDER_NAME')
+        SENDER_EMAIL=self.config.get('SMTP_USERNAME')
+        msg['From'] = f'{SENDER_NAME_VALUE} <{SENDER_EMAIL}>'
         msg['To'] = ', '.join(to_emails)
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
