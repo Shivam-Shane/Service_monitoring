@@ -24,8 +24,8 @@ class GmailProcceschecker():
             logging.error(f"Error parsing date: {e}")
             return False
         
-        if now - email_date > timedelta(minutes=self.config.TIME_THRESHOLD):  # if the email data is not greater than  a defined threshold
+        if now - email_date > timedelta(minutes=self.config.get('TIME_THRESHOLD')):  # if the email data is not greater than  a defined threshold
             return False
         else:
-            logging.debug(f"Email {subject} is greater than {self.config.TIME_THRESHOLD} minutes timeout")
+            logging.debug(f"Email {subject} is greater than {self.config.get('TIME_THRESHOLD')} minutes timeout")
         return True
