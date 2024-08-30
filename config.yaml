@@ -1,16 +1,22 @@
 #--------------- Define your email, file, and settings details here
 # Set up the IMAP connection
-IMAP_SERVER : 'imap.gmail.com'
-IMAP_PORT : 993
-SMTP_SERVER : 'smtp.gmail.com'
-SMTP_PORT : 587
+IMAP_SERVER: imap.gmail.com
+IMAP_PORT: 993
+SMTP_SERVER: smtp.gmail.com
+SMTP_PORT: 587
 # Set up your email credentials
-SMTP_USERNAME : 'shivam1@ivp.in'
-SMTP_PASSWORD : 'your_gmail_app_password'
-FROM_EMAIL : 'noreply via itsupport <itsupport@ivp.in>'
-CSV_FILE : 'emails.csv'
-KEYWORDS : ['critical', 'down']
+SMTP_USERNAME: shivam1@ivp.in
+SMTP_PASSWORD: your_gmail_app_password
+# from where the email will be received, so it won't read whole inbox
+FROM_EMAIL: noreply via itsupport <itsupport@ivp.in>
+CSV_FILE: emails.csv
+# Keywards that needs to be macthed in Email Subject
+KEYWORDS: [critical, down]
 # Threshold for which the emails would be valid for checking
 TIME_THRESHOLD: 900
-REPLY_MESSAGE : "Hi Team, \n Please check the alerts below, "
-SENDER_NAME: "Shivam"
+# Change the body of the email as per your needs
+REPLY_MESSAGE: "Hi Team, \n Please check the alerts below, "
+# Name of the Email Sender
+SENDER_NAME: new_version_value
+# Status of the Monitoring Service, default 0(Not running), 1( running)
+STATUS: 0
