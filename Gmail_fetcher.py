@@ -13,11 +13,11 @@ class GmailFetcher():
         try:
             logging.debug(f"Inside fetch_emails function")
             try:
-                logging.debug(f"Connecting to {self.config.IMAP_SERVER}")
-                mail = imaplib.IMAP4_SSL(self.config.IMAP_SERVER)
-                mail.login(self.config.SMTP_USERNAME, self.config.SMTP_PASSWORD)
+                logging.debug(f"Connecting to {self.config.get('IMAP_SERVER')}")
+                mail = imaplib.IMAP4_SSL(self.config.get('IMAP_SERVER'))
+                mail.login(self.config.get('SMTP_USERNAME'), self.config.get('SMTP_PASSWORD'))
                 mail.select('inbox')
-                logging.debug(f"Connected to {self.config.IMAP_SERVER}")
+                logging.debug(f"Connected to {self.config.get('IMAP_SERVER')}")
             except Exception as e:
                 logging.error(f"Failed to connect to IMAP server: {str(e)}")
                 return []
