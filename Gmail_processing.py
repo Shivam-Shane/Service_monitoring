@@ -59,8 +59,8 @@ class GmailProcess():
                         body = ''.join(part.get_payload(decode=True).decode() for part in msg.walk() if part.get_content_type() == 'text/plain')
                     else:
                         body = msg.get_payload(decode=True).decode()
-                    reply_body=self.config.get(['REPLY_MESSAGE'])
-                    reply_body = f"{reply_body}\n\nOriginal Message:\n{body}"
+                    reply=self.config.get('REPLY_MESSAGE')
+                    reply_body = f"{reply}\n\nOriginal Message:\n{body}"                   
 
                     # Create the forward message and attach the original email
                     original_email_str = msg.as_string()
