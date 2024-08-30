@@ -13,7 +13,7 @@ class GmailProcess():
     def process_emails(self,):
         logging.debug(f"Inside process_emails function")
         try:
-            data = pd.read_csv(self.config.CSV_FILE)            # Read  CSV file
+            data = pd.read_csv(self.config.get('CSV_FILE'))            # Read  CSV file
             logging.info("CSV file read successfully.")
         except Exception as e:
             logging.error(f"Failed to read CSV file: {e}") # exception  occurred during reading csv file    
@@ -50,7 +50,7 @@ class GmailProcess():
                     logging.info(f"Email for subject '{csv_subject}' was already sent today. Skipping...")
                     continue
 
-                if csv_subject in subject.lower() and any(keyword in subject.lower() for keyword in self.config.KEYWORDS):
+                if csv_subject in subject.lower() and any(keyword in subject.lower() for keyword in self.config.get('KEYWORDS')):
                     logging.info(f"Subject matches: {subject}") 
                     all_recipients = [row['Email_list']] + additional_recipients
                     
@@ -60,7 +60,7 @@ class GmailProcess():
                     else:
                         body = msg.get_payload(decode=True).decode()
                     
-                    reply_body = f"{self.config['REPLY_MESSAGE']}\n\nOriginal Message:\n{body}"
+                    reply_body = f"{self.config.get(['REPLY_MESSAGE'])}\n\nOriginal Message:\n{body}"
 
                     # Create the forward message and attach the original email
                     original_email_str = msg.as_string()
@@ -72,7 +72,7 @@ class GmailProcess():
                     if is_down:
                         data.at[index,'sent_for_down'] = 'received'
                     data.at[index, 'Last Sent'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    data.to_csv(self.config.CSV_FILE, index=False)
+                    data.to_csv(self.config.get('CSV_FILE'), index=False)
                     logging.info(f"Updated CSV with sent email for subject: {csv_subject}")
                     break
                 else:
