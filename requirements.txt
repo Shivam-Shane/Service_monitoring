@@ -1,6 +1,8 @@
-Django==5.1
-ensure==1.0.4
-pandas==2.2.2
-python-box==7.2.0
-pytz==2024.1
-PyYAML==6.0.2
+pandas
+numpy
+matplotlib
+django
+tzdata
+pillow
+pytz
+ruamel.yaml
