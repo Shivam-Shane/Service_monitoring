@@ -1,82 +1,86 @@
-import yaml
+from ruamel.yaml import YAML
 from logger import logging
-from box.exceptions import BoxValueError
-from ensure import ensure_annotations
-from box import ConfigBox
+import tempfile
+import os
+import shutil
 
-
-@ensure_annotations
-def read_yaml(path_to_yaml)-> ConfigBox: #reading yaml
+def read_yaml(path_to_yaml):
     """
-    Read a YAML file and return its contents as a ConfigBox.
+    Read a YAML file.
 
     Args:
         path_to_yaml (str): The path to the YAML file.
 
     Returns:
-        ConfigBox: The contents of the YAML file as a ConfigBox.
+        data: The YAML data.
 
     Raises:
         ValueError: If the YAML file is empty.
         Exception: If an error occurs while reading the YAML file.
     """
-    logging.info(f"Starting reading yaml file {path_to_yaml}")
+    logging.info(f"Starting to read YAML file: {path_to_yaml}")
     try:
-        with open(path_to_yaml) as yaml_file:
-            content=yaml.safe_load(yaml_file)
-            logging.info(f"yaml file: {yaml_file} loaded successfully")
-            return ConfigBox(content)
-    except BoxValueError:
-        raise ValueError("yaml file is empty")
-    except Exception as e: 
-        raise e   
-
-
-def write_yaml(path_to_yaml,updated_data):
-    """
-    Write a ConfigBox to a YAML file.
-
-    Args:
-        path_to_yaml (str): The path to the YAML file.
-        updated_data (ConfigBox): The updated data to write to the YAML file.
-    Raises:
-        Exception: If an error occurs while reading the YAML file.
-    """
-    logging.info(f"Starting writing yaml file {path_to_yaml}")
-    try: 
-        with open(path_to_yaml, "w") as yaml_file:
-            yaml.dump(updated_data,yaml_file,default_flow_style=False)
-            logging.info(f"yaml file: {path_to_yaml} write done successfully")    
+        yaml = YAML()
+        with open(path_to_yaml, 'r') as yaml_file:
+            content = yaml.load(yaml_file)
+            if content is None:
+                raise ValueError(f"The YAML file '{path_to_yaml}' is empty.")
+            logging.info(f"YAML file '{path_to_yaml}' of type '{type(content)}' loaded successfully")
+            return content
     except Exception as e:
+        logging.error(f"Error reading YAML file: {e}")
         raise e
 
-def update_yaml(path_to_yaml,updates):
+def update_yaml(path_to_yaml, updates):
     """
-    Update specified keys in a yaml file with new values
+    Update specified keys in a YAML file with new values.
 
     Args:
         path_to_yaml (str): The path to the YAML file.
-        updates (dict): The updates to be made to the YAML file in form of dict, key:value
+        updates (dict): The updates to be made to the YAML file in the form of dict, key:value pairs.
     
     Raises:
         Exception: If an error occurs while updating the YAML file.
-
     """
+    yaml = YAML()
+    
+    # Create a temporary file for the update
     try:
-        # Read the YAML file 
+        # Read the YAML file
         yaml_data = read_yaml(path_to_yaml)
+        accept_able_yaml =read_yaml("config_acceptable_values.yaml")
 
-        # Update the yaml file with new values
-        for key, value in updates.items():
-            keys=key.split('.') # Split key for nested updates
-            d=yaml_data
-            for k in keys[:-1]:
-                d=d.setdefault(k,{})# Checks if the key k exists in the current dictionary d,creates a new dictionary if not exists
-            d[keys[-1]]=value
-        yaml_data=yaml_data.to_dict() # saving to dictionary as read_yaml return config Box 
+        # Check each key in the dictionary and update if it is present
+        for key, new_value in updates.items():
+            if key in yaml_data and key in accept_able_yaml: # if keys matched in both config files
+                if new_value in accept_able_yaml[key]:
+                                                            # update the existing value
+                    yaml_data[key] = new_value
+                    logging.info(f"Updated '{key}' to '{new_value}'.")
+            elif key in yaml_data and key not in accept_able_yaml:  # if only matched in config files and not in acceptable update that
+                yaml_data[key] = new_value
+                
+                logging.info(f"Updated '{key}' to '{new_value}'.")
+            else:
+                logging.warning(f"Key '{key}' not found. No update performed for this key.")
+        
+        # Create a temporary file
+        with tempfile.NamedTemporaryFile(delete=False, mode='w', newline='', encoding='utf-8') as temp_file:
+            temp_file_name = temp_file.name
+            yaml.dump(yaml_data, temp_file)
+            temp_file.flush()
+            os.fsync(temp_file.fileno())
 
-        # write data back to yaml file
-        write_yaml(path_to_yaml,yaml_data)
-        logging.info(f"yaml file: {path_to_yaml} updated successfully with {updates}")
+        # Replace the original file with the updated temporary file
+        # Use shutil.copy2() to copy the temp file to the original file path
+        shutil.copy2(temp_file_name, path_to_yaml)
+        os.remove(temp_file_name)  # Clean up the temporary file
+        
+        logging.info(f"YAML file '{path_to_yaml}' updated successfully.")
+    
     except Exception as e:
+        logging.error(f"Error updating YAML file: {e}")
+        # Cleanup in case of error
+        if os.path.exists(temp_file_name):
+            os.remove(temp_file_name)
         raise e
