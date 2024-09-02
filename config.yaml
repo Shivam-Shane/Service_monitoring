@@ -15,7 +15,8 @@ KEYWORDS: [critical, down]
 # Threshold for which the emails would be valid for checking
 TIME_THRESHOLD: 900
 # Change the body of the email as per your needs
-REPLY_MESSAGE: "Hi Team, \n Please review the alerts below and provide an update at your earliest convenience."
+REPLY_MESSAGE: "Hi Team, \n Please review the alerts below and provide an update at
+  your earliest convenience."
 # Name of the Email Sender
 SENDER_NAME: Shivam
 # Status of the Monitoring Service, default 0(Not running), 1( running)
