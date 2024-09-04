@@ -33,9 +33,9 @@ class View_handler():
                 else:
                     logging.info("Process is already running.")
             logging.info("Returning current batch...")
-            current_batch,emails_to_process,time_remaining= self.runner.get_current_batch()
+            current_batch,emails_to_process,time_remaining,time_type= self.runner.get_current_running_details()
             logging.debug(f"email length {emails_to_process}")
-            return context, current_batch, emails_to_process,time_remaining
+            return context, current_batch, emails_to_process,time_remaining,time_type
         elif self.config['STATUS']==0:
             try:
                 logging.info("Trying to stop monitoring...")
