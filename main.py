@@ -17,7 +17,7 @@ class ServiceMonitoringMainRunner:
         self.lock = threading.Lock()  # Lock to ensure single processing of process email
         self.thread = None
         self.current_batch = 0
-        self.total_batches_processed = 0  # Persistent across multiple runs on runner method.
+        self.total_batches_processed = 1  # Persistent across multiple runs on runner method.
         self.emails_to_process=0
         self.time_remaining = 0
 
@@ -67,20 +67,25 @@ class ServiceMonitoringMainRunner:
 
                 time.sleep(sleep_interval)  # Sleep for a short interval
                 total_sleep_time += sleep_interval  # Increment the total sleep time
+                self.time_remaining = remaining_time - total_sleep_time  # Update real-time remaining time
+
 
         # Clear the console when the processing stops
         os.system('cls')
         logging.info("Processing stopped.")
         return self.current_batch, self.emails_to_process,self.time_remaining # Return current_batch when the loop ends
 
-    def get_current_batch(self):
-        """ Returns the current batch only if the runner is active.
+    def get_current_running_details(self):
+        """ Returns the current running details of services only if the runner is active.
         Args: None
 
-        Return: total_batch_size_that_are_processed
+        Return: total_batches(int),email_to process(int),time_remaining(float),time_type(str)
         """
         if self.running.is_set():
-            return self.total_batches_processed,self.emails_to_process,self.time_remaining  # Return the total processed batches
+            time_type = "minutes" if self.time_remaining >= 60 else "seconds"
+            time_remaining = round(self.time_remaining / 60 if time_type == "minutes" else self.time_remaining)
+
+            return self.total_batches_processed, self.emails_to_process, time_remaining, time_type 
         else:
             return None  # Runner is not active
 
