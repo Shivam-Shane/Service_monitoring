@@ -31,20 +31,19 @@ class View_handler():
                     finally:
                         self._is_running = False  # Reset the flag after the process ends
                 else:
-                    print("Process is already running.")
+                    logging.info("Process is already running.")
             logging.info("Returning current batch...")
-            current_batch = self.runner.get_current_batch()
-            return context, current_batch
+            current_batch,emails_to_process,time_remaining= self.runner.get_current_batch()
+            logging.debug(f"email length {emails_to_process}")
+            return context, current_batch, emails_to_process,time_remaining
         elif self.config['STATUS']==0:
             try:
                 logging.info("Trying to stop monitoring...")
                 self.runner.stop() # Stop the process
             except Exception as e:
                 raise e
-            return context, None # Return None for second arguments 
+            return context, None,None,None # Return None for rest arguments 
             
         else:
             logging.error("Invalid status in config.yaml")
-            return context, None # Return None for second arguments
-        
-    
+            return context, None,None,None # Return None for rest arguments
