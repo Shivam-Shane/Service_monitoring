@@ -20,7 +20,7 @@
     <section id="home">
         <div class="home-section">
         <h1>Welcome to Gmail Monitoring</h1>
-        <p>Continuously monitors the Gmail inbox for new emails from critical/down services or devices.  Based on the parsed information and rules defined in the CSV file, the system routes the email or a summary alert to the appropriate team </p>
+        <p>Continuously monitors the Gmail inbox for new emails from critical/down services or devices. Based on the parsed information and rules defined in the CSV file, the system routes the email or a summary alert to the appropriate team </p>
 
         {% if configuration_details.config.STATUS == 0 %}
         <p>Monitoring is not running, please click on the button below to start.</p>
@@ -37,14 +37,26 @@
                 <input type="submit" value="Stop" class="stop-button">
             </form>
 
-            <div class="graph" id="Email_sent_per_day">             
-                <img src="data:image/png;base64,{{ email_sent_per_day }}" alt="Email Sent Per Day" class="graph-img">                
+            <div class="graph" id="Email_sent_per_day"> 
+                {% if email_sent_per_day is not none %}            
+                <img src="data:image/png;base64,{{ email_sent_per_day }}" alt="Email Sent Per Day" class="graph-img">
+                {% else %}
+                <p>No data available for Email Sent Per Day.</p>
+                {% endif %}                
             </div>
             <div class="graph" id="email_sent_for_per_service">
+                {% if email_sent_for_per_service is not none %} 
                 <img src="data:image/png;base64,{{ email_sent_for_per_service }}" alt="Email Sent for Each Service" class="graph-img">
+                {% else %}
+                <p>No data available for Email Sent Per Service.</p>
+                {% endif %} 
             </div>
             <div class="graph" id="heatmap_of_activity">
+                {% if heatmap_of_activity is not none %}
                 <img src="data:image/png;base64,{{ heatmap_of_activity }}" alt="Heatmap of Activity" class="graph-img">
+                {% else %}
+                <p>No data available for Heatmap of Activity.</p>
+                {% endif %}
             </div>
 
         {% endif %}
@@ -54,7 +66,7 @@
             <div class="sidebar">
                 <ul>
                     <li>Current Batch  {{ current_batch }}</li>
-                    <li>Next Batch will start in {{ time_remaining }}</li>
+                    <li>Next Batch will start in {{ time_remaining }} {{ time_type }}</li>
                     <li>Processing Emails {{ emails_to_process }}</li>
 
                 </ul>

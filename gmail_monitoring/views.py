@@ -14,7 +14,7 @@ class View_Functions():
 
     def index_view(self,request):
         # Fetch configuration details, current batch, and emails to process from view handler
-        configuration_details,current_batch,emails_to_process,time_remaining=self.viewhandler.main_view_handler()
+        configuration_details,current_batch,emails_to_process,time_remaining,time_type=self.viewhandler.main_view_handler()
 
         # Generate and encode graph images
         graph_data = self.graphical_orientation.plot_graph()
@@ -36,6 +36,7 @@ class View_Functions():
             'configuration_details': configuration_details,
             'current_batch': current_batch,
             'time_remaining':time_remaining,
+            'time_type':time_type,
             'emails_to_process': emails_to_process,
             'email_sent_per_day': encoded_graphs.get('email_sent_per_day'),
             'email_sent_for_per_service': encoded_graphs.get('email_sent_for_per_service'),
