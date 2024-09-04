@@ -77,3 +77,4 @@ class GmailProcess():
                     break
                 else:
                     pass    # if not matched, just ignoring 
+        return len(emails)
