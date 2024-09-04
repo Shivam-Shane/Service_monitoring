@@ -16,13 +16,13 @@ Including another URLconf
 """
 # monitor/urls.py
 from django.urls import path
-from views import index_view
-from django.contrib import admin
-from django.urls import path, include
+from views import View_Functions
+from django.urls import path
 
+view_list=View_Functions()
 urlpatterns = [
-    path('', index_view, name='index_view'),
-    # path('start/', start_monitoring_view, name='start_monitoring'),
-    # path('stop/', stop_monitoring_view, name='stop_monitoring'),
-    path('admin/', admin.site.urls),
+    
+    path('', view_list.index_view, name='index_view'),
+    path('start/', view_list.start_monitoring, name='start_monitoring'),
+    path('stop/', view_list.stop_monitoring, name='stop_monitoring'),
 ]
