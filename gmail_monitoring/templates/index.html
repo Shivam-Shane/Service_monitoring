@@ -14,18 +14,68 @@
             <li><a href="#configuration" onclick="showSection('configuration')">Configuration</a></li>
             <li><a href="#settings" onclick="showSection('settings')">Settings</a></li>
         </ul>
+        <p class="last_refresh_time">Last Refreshed: {{ last_refresh_time }}</p>
     </nav>
 
     <section id="home">
+        <div class="home-section">
         <h1>Welcome to Gmail Monitoring</h1>
-        <p>This is the home page content.</p>
+        <p>Continuously monitors the Gmail inbox for new emails from critical/down services or devices.  Based on the parsed information and rules defined in the CSV file, the system routes the email or a summary alert to the appropriate team </p>
+
+        {% if configuration_details.config.STATUS == 0 %}
+        <p>Monitoring is not running, please click on the button below to start.</p>
+            <form action="{% url 'start_monitoring' %}" method="post">
+                
+                {% csrf_token %}
+                <input type="submit" value="Start" class="start-button">
+            </form>
+
+        {% else %}
+
+            <form action="{% url 'stop_monitoring' %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Stop" class="stop-button">
+            </form>
+
+            <div class="graph" id="Email_sent_per_day">             
+                <img src="data:image/png;base64,{{ email_sent_per_day }}" alt="Email Sent Per Day" class="graph-img">                
+            </div>
+            <div class="graph" id="email_sent_for_per_service">
+                <img src="data:image/png;base64,{{ email_sent_for_per_service }}" alt="Email Sent for Each Service" class="graph-img">
+            </div>
+            <div class="graph" id="heatmap_of_activity">
+                <img src="data:image/png;base64,{{ heatmap_of_activity }}" alt="Heatmap of Activity" class="graph-img">
+            </div>
+
+        {% endif %}
+
+        {% if configuration_details.config.STATUS == 1 %}
+        
+            <div class="sidebar">
+                <ul>
+                    <li>Current Batch  {{ current_batch }}</li>
+                    <li>Next Batch will start in {{ time_remaining }}</li>
+                    <li>Processing Emails {{ emails_to_process }}</li>
+
+                </ul>
+                
+            </div>
+        
+         {% endif %}
+
+
+
+    </div>
+
+    
+
     </section>
 
     <section id="configuration" style="display:none;">
         <h1>Gmail Monitoring Configuration:</h1>
         <form method="POST">
             {% csrf_token %}
-            {% for key, value in config.items %}
+            {% for key, value in configuration_details.config.items %}
                 <label for="{{ key }}">{{ key }}:</label>
                 <input type="{% if 'SMTP_PASSWORD' in key %}password{% else %}text{% endif %}" 
                    id="{{ key }}" 
@@ -34,12 +84,13 @@
                    readonly>
                 <br>
             {% endfor %}
+            <p>To update the configurtion go to settings </p>
         </form>
-    </section>
+    </section> 
 
     <section id="settings" style="display:none;">
         <h1>Settings</h1>
-        <p>This is the settings page content.</p>
+        <p>Check it out </p>
     </section>
 
     <script src="{% static 'scripts.js' %}"></script>
