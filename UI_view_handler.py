@@ -42,8 +42,8 @@ class View_handler():
                 self.runner.stop() # Stop the process
             except Exception as e:
                 raise e
-            return context, None,None,None # Return None for rest arguments 
+            return context, None,None,None,None # Return None for rest arguments 
             
         else:
             logging.error("Invalid status in config.yaml")
-            return context, None,None,None # Return None for rest arguments
+            return context, None,None,None,None # Return None for rest arguments
