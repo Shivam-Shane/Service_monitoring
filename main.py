@@ -87,7 +87,7 @@ class ServiceMonitoringMainRunner:
 
             return self.total_batches_processed, self.emails_to_process, time_remaining, time_type 
         else:
-            return None  # Runner is not active
+            return None,None,None,None  
 
     # Method to start the service
     def start(self):
