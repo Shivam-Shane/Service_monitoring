@@ -6,6 +6,9 @@ from logger import logging
 import matplotlib
 from util import read_yaml
 
+logging.getLogger('matplotlib.font_manager').setLevel(logging.WARNING)
+
+
 class GmailGraph:
     def __init__(self):
         matplotlib.use('Agg') # Using Agg so there is no issue of main thread execution that matplotlib accepts
