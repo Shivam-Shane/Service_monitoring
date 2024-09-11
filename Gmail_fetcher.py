@@ -1,5 +1,5 @@
 import imaplib
-import email
+from email import message_from_bytes
 from email.header import decode_header
 from logger import logging
 from gmail_processing_checker import GmailProcceschecker
@@ -8,13 +8,14 @@ from util import read_yaml
 class GmailFetcher():
     def __init__(self):
         self.config = read_yaml("config.yaml")
-        
+        self.GmailProccescheckerobject = GmailProcceschecker()  
         try:
             logging.debug(f"Connecting to {self.config.get('IMAP_SERVER')}")
+
             self.mail = imaplib.IMAP4_SSL(self.config.get('IMAP_SERVER'))
             self.mail.login(self.config.get('SMTP_USERNAME'), self.config.get('SMTP_PASSWORD'))
             self.mail.select('inbox')
-            logging.debug(f"Connected to {self.config.get('IMAP_SERVER')}")
+            logging.info(f"Connected to {self.config.get('IMAP_SERVER')}")
         except Exception as e:
             logging.error(f"Failed to connect to IMAP server: {str(e)}")
             return []
@@ -31,9 +32,14 @@ class GmailFetcher():
             unique_subjects = set() # stores all unique subjects
             filtered_emails = []  # filtered email for futher processing 
             for email_id in email_ids:
+                logging.info(f"Emails {email_id}")
                 result, message_data = self.mail.fetch(email_id, '(RFC822)')
-                raw_email = message_data[0][1]
-                msg = email.message_from_bytes(raw_email)
+                if isinstance(message_data[0], tuple) and isinstance(message_data[0][1], bytes):
+                    raw_email = message_data[0][1]  # Making sure it's bytes
+                    msg = message_from_bytes(raw_email)
+                else:
+                    logging.error(f"Unexpected message_data format for email_id {email_id}.")
+                    continue 
 
                 subject, encoding = decode_header(msg['subject'])[0]
                 if isinstance(subject, bytes):
@@ -47,13 +53,12 @@ class GmailFetcher():
             logging.debug(f"Sorted emails {emails}")
             for email in sorted_emails: 
                 subject, from_email, date, msg = email
-                
-                if subject not in unique_subjects and GmailProcceschecker.should_process_email(self,subject, from_email, date):
+                # ensure subject id not duplicates and checks it should process only legimate emails
+                if subject not in unique_subjects and self.GmailProccescheckerobject.should_process_email(subject, from_email, date):
                     filtered_emails.append(email)  # Add to final list
                     unique_subjects.add(subject)  # Mark subject as processed
                 else:
-                    print(f"Skipping email - Subject: {subject}, From: {from_email}, Date: {date}")
-            self.mail.logout()
+                    logging.debug(f"Skipping email - Subject: {subject}, From: {from_email}, Date: {date}")
             logging.debug(f"filtered emails {filtered_emails}")
             return emails            
 
@@ -62,4 +67,5 @@ class GmailFetcher():
         except Exception as e:
             logging.error(f"General error: {str(e)}")
         finally:
+            logging.debug(f"Finished processing closing server")
             self.mail.logout()
