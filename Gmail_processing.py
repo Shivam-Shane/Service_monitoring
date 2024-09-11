@@ -15,7 +15,7 @@ class GmailProcess():
     def process_emails(self,):
         logging.debug(f"Inside process_emails function")
         try:
-            data = pd.read_csv(self.config.get('CSV_FILE'))            # Read  CSV file
+            data = pd.read_csv(self.config.get('CSV_FILE'))     # Initaily data reading from CSV file
             logging.info("CSV file read successfully.")
         except Exception as e:
             logging.error(f"Failed to read CSV file: {e}") # exception  occurred during reading csv file    
@@ -79,6 +79,7 @@ class GmailProcess():
                         data.at[index, 'Last Sent'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         data.to_csv(self.config.get('CSV_FILE'), index=False)
                         logging.info(f"Updated CSV with sent email for subject: {csv_subject}")
+                        data = pd.read_csv(self.config.get('CSV_FILE')) # Re-reading the updated CSV file.
                         break
                     else:
                         pass    # if not matched, just ignoring 
