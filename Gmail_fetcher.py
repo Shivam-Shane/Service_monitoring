@@ -8,29 +8,30 @@ from util import read_yaml
 class GmailFetcher():
     def __init__(self):
         self.config = read_yaml("config.yaml")
+        
+        try:
+            logging.debug(f"Connecting to {self.config.get('IMAP_SERVER')}")
+            self.mail = imaplib.IMAP4_SSL(self.config.get('IMAP_SERVER'))
+            self.mail.login(self.config.get('SMTP_USERNAME'), self.config.get('SMTP_PASSWORD'))
+            self.mail.select('inbox')
+            logging.debug(f"Connected to {self.config.get('IMAP_SERVER')}")
+        except Exception as e:
+            logging.error(f"Failed to connect to IMAP server: {str(e)}")
+            return []
 
     def fetch_emails(self):
         try:
-            logging.debug(f"Inside fetch_emails function")
-            try:
-                logging.debug(f"Connecting to {self.config.get('IMAP_SERVER')}")
-                mail = imaplib.IMAP4_SSL(self.config.get('IMAP_SERVER'))
-                mail.login(self.config.get('SMTP_USERNAME'), self.config.get('SMTP_PASSWORD'))
-                mail.select('inbox')
-                logging.debug(f"Connected to {self.config.get('IMAP_SERVER')}")
-            except Exception as e:
-                logging.error(f"Failed to connect to IMAP server: {str(e)}")
-                return []
-
             # Search for emails from 'itsupport@ivp.in' and that are unseen
             search_criteria = '(UNSEEN FROM "itsupport@ivp.in")'
-            result, data = mail.search(None, search_criteria)
+            result, data = self.mail.search(None, search_criteria)
             email_ids = data[0].split()
             logging.info(f"Emails found: {email_ids}")
 
-            emails = []
+            emails = [] # all emails retived from the database
+            unique_subjects = set() # stores all unique subjects
+            filtered_emails = []  # filtered email for futher processing 
             for email_id in email_ids:
-                result, message_data = mail.fetch(email_id, '(RFC822)')
+                result, message_data = self.mail.fetch(email_id, '(RFC822)')
                 raw_email = message_data[0][1]
                 msg = email.message_from_bytes(raw_email)
 
@@ -41,16 +42,24 @@ class GmailFetcher():
                 from_email = msg['from']
                 date = msg['date']
                 logging.debug(f"Fetched email - Subject: {subject}, From: {from_email}, Date: {date}")
+                emails.append((subject, from_email, date, msg)) # appends all emails data
+            sorted_emails = sorted(emails, key=lambda x: x[2], reverse=True) # sorting the emails by date
+            logging.debug(f"Sorted emails {emails}")
+            for email in sorted_emails: 
+                subject, from_email, date, msg = email
                 
-                if GmailProcceschecker.should_process_email(self,subject, from_email, date):  # This checkes if the email should be processed or not
-                    emails.append((subject, from_email, date, msg))
+                if subject not in unique_subjects and GmailProcceschecker.should_process_email(self,subject, from_email, date):
+                    filtered_emails.append(email)  # Add to final list
+                    unique_subjects.add(subject)  # Mark subject as processed
                 else:
-                    logging.debug(f"Skipping email - Subject: {subject}, From: {from_email}, Date: {date}")
-            mail.logout()
+                    print(f"Skipping email - Subject: {subject}, From: {from_email}, Date: {date}")
+            self.mail.logout()
+            logging.debug(f"filtered emails {filtered_emails}")
+            return emails            
 
-            return emails
         except imaplib.IMAP4.error as e:
             logging.error(f"IMAP error: {str(e)}")
         except Exception as e:
             logging.error(f"General error: {str(e)}")
-        return []
+        finally:
+            self.mail.logout()
