@@ -79,6 +79,7 @@ class GmailProcess():
                         data.at[index, 'Last Sent'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         data.to_csv(self.config.get('CSV_FILE'), index=False)
                         logging.info(f"Updated CSV with sent email for subject: {csv_subject}")
+                        logging.info(f"Re-reading csv file: {self.config.get('CSV_FILE')}")
                         data = pd.read_csv(self.config.get('CSV_FILE')) # Re-reading the updated CSV file.
                         break
                     else:
