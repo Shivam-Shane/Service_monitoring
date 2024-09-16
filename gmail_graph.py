@@ -35,13 +35,13 @@ class GmailGraph:
     def email_sent_per_day_graph(self):
         # Load data from CSV file and convert 'Last Sent' to datetime format
         self.data=self.load_data()
-
+        self.data['Last Sent']=pd.to_datetime(self.data['Last Sent'], errors='coerce') 
+        self.data = self.data.dropna(subset=['Last Sent'])    # remove any null values
         if self.data['Last Sent'].empty:
             logging.warning("DataFrame is empty. Skipping plot creation.")
             return None
         
-        self.data['Last Sent']=pd.to_datetime(self.data['Last Sent'], errors='coerce') 
-        self.data = self.data.dropna(subset=['Last Sent'])    # remove any null values
+        
         emails_per_day = self.data.groupby(self.data['Last Sent'].dt.date).size()
         
         fig, ax = plt.subplots(figsize=(8, 4))
