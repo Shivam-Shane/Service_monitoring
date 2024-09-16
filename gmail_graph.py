@@ -66,7 +66,8 @@ class GmailGraph:
 
     def email_sent_for_per_service_graph(self):
         self.data=self.load_data()
-
+        self.data['Last Sent']=pd.to_datetime(self.data['Last Sent'], errors='coerce') 
+        self.data = self.data.dropna(subset=['Last Sent'])
         if self.data['Last Sent'].empty:
             logging.warning("DataFrame is empty. Skipping plot creation.")
             return None
